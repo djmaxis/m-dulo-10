@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+   <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <link rel="icon" href="">
+      <!-- ------------------------------------------------- -->
+      <title>Calculadora Luhn</title>
+      <meta name="description" content="Online calculation of a check digit using the Luhn algorithm. Fill in the box below to have it instantly computed.">
+      <script type="text/javascript" src="js/luhn.js"></script>
+      <div class="container">
+      <!-- ------------------------------------------------------- -->
+      <div>
+      <h1>Calculadora Luhn<img src="js/photo_2023-03-02_21-10-01-PhotoRoom.png-PhotoRoom.png" width="536" height="357" alt=""/></h1>
+      <p>
+         <script type="text/javascript">
+            function onChange() {
+                var partcode = document.form1.partcode.value.replace(/\s/g, '')
+                var ok = /^\d+$/.test(partcode)
+                var checkdigit = ok ? luhn_calculate(partcode) : ""
+                var fullcode = ok ? partcode + checkdigit : ""
+                document.form1.checkdigit.value = checkdigit
+                document.form1.fullcode.value = fullcode
+                document.getElementById('partcode-side').innerHTML = partcode.length
+                document.getElementById('fullcode-side').innerHTML = fullcode.length
+            }
+         </script>
+      <div class="card mb-4">
+         <div class="card-body">
+            <form name="form1">
+               <div class="form-group form-row">
+                  <label for="partcode" class="col-sm-3 col-form-label">
+                  Numeros Validar&nbsp; </label>
+                  <div class="col-sm-7 offset-sm-0">
+                     <input type="text" id="partcode" name="partcode" class="form-control" aria-describedby="partcode-hint" onchange="onChange()" onkeyup="onChange()">
+                     <small id="partcode-hint" name="partcode-hint" class="form-text text-muted">
+                     &nbsp; </small>
+                  </div>
+                  <div class="col-sm-2 col-form-label">
+                     <small class="text-muted">
+                     <span id="partcode-side" name="partcode-side">0</span> digitos
+                     </small>
+                  </div>
+               </div>
+               <div class="form-group form-row">
+                  <label for="checkdigit" class="col-sm-3 col-form-label">
+                  Digito Verificado
+                  </label>
+                  <div class="col-sm-2 offset-sm-0">
+                     <input type="text" id="checkdigit" name="checkdigit" class="form-control" aria-describedby="checkdigit-hint" readonly="readonly">
+                     <small id="checkdigit-hint" name="checkdigit-hint" class="form-text text-muted">
+                     Siguiente digito&nbsp; </small>
+                  </div>
+               </div>
+               <div class="form-group form-row">
+                  <label for="fullcode" class="col-sm-3 col-form-label">
+                  Calculo Completo&nbsp; </label>
+                  <div class="col-sm-7 offset-sm-0">
+                     <input type="text" id="fullcode" name="fullcode" class="form-control" aria-describedby="fullcode-hint" readonly="readonly">
+                     <small id="fullcode-hint" name="fullcode-hint" class="form-text text-muted">
+                     &nbsp;Numero Validar + Siguiente digito</small>
+                  </div>
+                  <div class="col-sm-2 col-form-label">
+                     <small class="text-muted">
+                     <span id="fullcode-side" name="fullcode-side">0</span> digitos
+                     </small>
+                  </div>
+               </div>
+            </form>
+         </div>
+      </div>
+      </style>
+      <script type="text/javascript" language="JavaScript">
+   
+         function luhn_sum(str) {
+             var sum = 0;
+             var is_every_second_digit = false;
+             var c,digit,i;
+             var CHARCODE0='0'.charCodeAt(0);
+             // elimina todas las cosas que no son dígitos (espacios, guiones, puntos...)
+             var digitstr=str.replace(/[^0-9]/g,"");
+             i = digitstr.length-1;
+         
+             while (i >= 0){
+               //convierte el dígito del carácter en el dígito del número
+                 digit=digitstr.charCodeAt(i) - CHARCODE0;
+        
+                 if (is_every_second_digit) {
+                     digit *= 2;
+                     if (digit > 9){
+                         digit = digit - 9;
+                     }
+                 } 
+             
+                 is_every_second_digit = !is_every_second_digit;
+                 sum += digit;
+              
+                 i--;
+             }
+             return(sum);
+         }
+      
+         function veri_luhn(cform){
+             var js_err_tag=document.getElementById("js_err"); 
+             js_err_tag.firstChild.nodeValue =" ";
+             var str=cform.num.value;
+             if (!str.match(/[0-9][0-9]/)){ 
+                 js_err_tag.firstChild.nodeValue = '';
+                 return(false);
+             }
+             cform.num.value=str.replace(/[^0-9]/g,"");
+             var s=luhn_sum(str);
+             if ((s % 10) == 0){
+                 cform.isvalid.value="SI";
+             }else{
+                 cform.isvalid.value="NO";
+             }
+             return(false);
+         }
+              
+		  
+      </script>
+   </head>
+   <form onsubmit="veri_luhn(this);return false;" name="myform">
+      <table>
+         <tbody>
+            <tr>
+               <td>Validar #:</td>
+               <td><input name="num" type="text" class="in" autocomplete="off" size="30"></td>
+            </tr>
+            <tr>
+               <td>Es valido?: </td>
+               <td><input name="isvalid" size="5" type="text" readonly="readonly" class="ou"></td>
+            </tr>
+         </tbody>
+      </table>
+      <br>
+      <input value=" clear " type="reset">
+      <input value=" Calcular " type="submit">
+      <br>
+      <p id="js_err" style="color:#a00;"> </p>
+      <br>
+   </form>
+   </body>
+</html>
